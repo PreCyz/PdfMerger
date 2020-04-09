@@ -82,7 +82,7 @@ public class Controller implements Initializable {
             }
             ut.setDestinationFileName(destinationFileName);
             ut.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-            infoTextArea.setText("Files merged. Find the result.pdf in here");
+            infoTextArea.setText(String.format("Files merged.%nFind the result.pdf in here"));
         } catch (IOException e) {
             logger.error("Something went wrong.", e);
             infoTextArea.setText("Something went wrong :(");

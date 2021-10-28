@@ -16,10 +16,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Controller implements Initializable {
@@ -74,7 +73,10 @@ public class Controller implements Initializable {
     }
 
     private void mergePdfs() {
-        String destinationFileName = String.format("%s%sresult.pdf", destinationDir, File.separator);
+        String fileName = String.format("merge-result-%s.pdf",
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-h24mmss"))
+        );
+        String destinationFileName = String.format("%s%s%s", destinationDir, File.separator, fileName);
         try {
             PDFMergerUtility ut = new PDFMergerUtility();
             for (File file : files) {
@@ -82,7 +84,10 @@ public class Controller implements Initializable {
             }
             ut.setDestinationFileName(destinationFileName);
             ut.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-            infoTextArea.setText(String.format("Files merged.%nFind the result.pdf in here"));
+            String fileNames = files.stream().map(File::getName).collect(Collectors.joining("\n"));
+            infoTextArea.setText(String.format("[%d] files merged.%n%s%nFind the [%s] in here:%n%s",
+                    files.size(), fileNames, fileName, destinationFileName
+            ));
         } catch (IOException e) {
             logger.error("Something went wrong.", e);
             infoTextArea.setText("Something went wrong :(");

@@ -6,8 +6,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -29,6 +31,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toCollection;
+
 public class Controller implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);
@@ -40,11 +44,11 @@ public class Controller implements Initializable {
     @FXML
     private TextArea infoTextArea;
     @FXML
-    private CheckBox sortByCreationDateAscCheckBox;
+    private RadioButton sortByCreationTimeAscRadioButton;
     @FXML
-    private CheckBox sortByCreationDateDescCheckBox;
+    private RadioButton sortByCreationTimeDescRadioButton;
     @FXML
-    private CheckBox sortByNameCheckBox;
+    private RadioButton sortByNameRadioButton;
 
     private LinkedList<File> files;
     private String destinationDir;
@@ -59,9 +63,25 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         choosePdfsButton.setOnAction(choosePdfsAction());
         mergePdfsButton.setOnAction(mergePdfsAction());
-        sortByCreationDateDescCheckBox.selectedProperty().addListener(sortByCreationTimeChangeListener(true));
-        sortByCreationDateAscCheckBox.selectedProperty().addListener(sortByCreationTimeChangeListener(false));
-        sortByNameCheckBox.selectedProperty().addListener(sortByNameChangeListener());
+        ToggleGroup toggleGroup = new ToggleGroup();
+        sortByCreationTimeAscRadioButton.setToggleGroup(toggleGroup);
+        sortByCreationTimeDescRadioButton.setToggleGroup(toggleGroup);
+        sortByNameRadioButton.setToggleGroup(toggleGroup);
+        toggleGroup.selectedToggleProperty().addListener(radioChangeListener());
+    }
+
+    private ChangeListener<Toggle> radioChangeListener() {
+        return (observableValue, oldValue, newValue) -> {
+            if (newValue.equals(sortByCreationTimeAscRadioButton)) {
+                files = files.stream().sorted(creationTimeComparator(false)).collect(toCollection(LinkedList::new));
+            } else if (newValue.equals(sortByCreationTimeDescRadioButton)) {
+                files = files.stream().sorted(creationTimeComparator(true)).collect(toCollection(LinkedList::new));
+            } else {
+                files = files.stream().sorted(Comparator.comparing(File::getName)).collect(toCollection(LinkedList::new));
+            }
+            infoTextArea.clear();
+            infoTextArea.setText(files.stream().map(File::getName).collect(Collectors.joining("\n")));
+        };
     }
 
     private EventHandler<ActionEvent> choosePdfsAction() {
@@ -111,22 +131,6 @@ public class Controller implements Initializable {
         }
     }
 
-    private ChangeListener<Boolean> sortByCreationTimeChangeListener(boolean isDesc) {
-        return (observableValue, oldValue, newValue) -> {
-            if (newValue) {
-                files = files.stream().sorted(creationTimeComparator(isDesc)).collect(Collectors.toCollection(LinkedList::new));
-                infoTextArea.clear();
-                infoTextArea.setText(files.stream().map(File::getName).collect(Collectors.joining("\n")));
-                sortByNameCheckBox.setSelected(false);
-                if (isDesc) {
-                    sortByCreationDateAscCheckBox.setSelected(false);
-                } else {
-                    sortByCreationDateDescCheckBox.setSelected(false);
-                }
-            }
-        };
-    }
-
     private Comparator<File> creationTimeComparator(boolean isDesc) {
         return (o1, o2) -> {
             try {
@@ -140,15 +144,4 @@ public class Controller implements Initializable {
         };
     }
 
-    private ChangeListener<? super Boolean> sortByNameChangeListener() {
-        return (observableValue, oldValue, newValue) -> {
-            if (newValue) {
-                files = files.stream().sorted(Comparator.comparing(File::getName)).collect(Collectors.toCollection(LinkedList::new));
-                infoTextArea.clear();
-                infoTextArea.setText(files.stream().map(File::getName).collect(Collectors.joining("\n")));
-                sortByCreationDateDescCheckBox.setSelected(false);
-                sortByCreationDateAscCheckBox.setSelected(false);
-            }
-        };
-    }
 }

@@ -20,7 +20,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             primaryStage.setOnCloseRequest(windowEvent -> System.exit(0));
-            primaryStage.setTitle("PdfMerger 1.1");
+            primaryStage.setTitle("PdfMerger 1.0.2");
             primaryStage.show();
             primaryStage.setResizable(false);
             Scene scene = new Scene(root(primaryStage));

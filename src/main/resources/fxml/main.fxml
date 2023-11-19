@@ -3,22 +3,48 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
-<SplitPane dividerPositions="0.2471324296141814" prefHeight="155.0" prefWidth="577.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.text.Font?>
+<SplitPane dividerPositions="0.07542804257288292" prefHeight="320.0" prefWidth="831.0" xmlns="http://javafx.com/javafx/17.0.9" xmlns:fx="http://javafx.com/fxml/1">
    <items>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="154.0" prefWidth="134.0">
          <children>
-            <Button fx:id="choosePdfsButton" layoutX="12.0" layoutY="7.0" mnemonicParsing="false" text="Add PDFs" />
-            <Button fx:id="mergePdfsButton" layoutX="12.0" layoutY="122.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" text="Merge" />
-            <RadioButton fx:id="sortByCreationTimeAscRadioButton" layoutX="12.0" layoutY="42.0" mnemonicParsing="false" text="Sort by C.T. ASC" />
-            <RadioButton fx:id="sortByCreationTimeDescRadioButton" layoutX="12.0" layoutY="66.0" mnemonicParsing="false" text="Sort by C.T. DESC" />
-            <RadioButton fx:id="sortByNameRadioButton" layoutX="12.0" layoutY="90.0" mnemonicParsing="false" text="Sort by name ASC" />
+            <Button id="plus-button" fx:id="choosePdfsButton" layoutX="15.0" layoutY="14.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="34.0" stylesheets="@../css/buttons.css">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></Button>
+            <Button id="merge-button" fx:id="mergePdfsButton" layoutX="15.0" layoutY="58.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="34.0" stylesheets="@../css/buttons.css">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></Button>
          </children>
       </AnchorPane>
-      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="154.0" prefWidth="452.0">
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="154.0" prefWidth="431.0">
          <children>
-            <TextArea fx:id="infoTextArea" editable="false" layoutX="5.0" layoutY="4.0" prefHeight="146.0" prefWidth="421.0" />
+            <TextArea fx:id="infoTextArea" editable="false" layoutX="5.0" layoutY="218.0" prefHeight="94.0" prefWidth="330.0" wrapText="true" />
+            <TableView fx:id="filesTableView" layoutX="5.0" layoutY="7.0" prefHeight="200.0" prefWidth="704.0" tableMenuButtonVisible="true">
+              <columns>
+                <TableColumn editable="false" prefWidth="396.0000581741333" text="File name" />
+                <TableColumn editable="false" prefWidth="170.39996337890625" text="File path" />
+                  <TableColumn editable="false" prefWidth="126.4000244140625" text="Created" />
+              </columns>
+            </TableView>
+            <Button id="arrow-up-button" fx:id="upButton" layoutX="719.0" layoutY="79.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="34.0" stylesheets="@../css/buttons.css">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+            <Button id="arrow-down-button" fx:id="downButton" layoutX="719.0" layoutY="116.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="33.0" stylesheets="@../css/buttons.css">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+            <RadioButton fx:id="sortByCreationTimeAscRadioButton" contentDisplay="TOP" layoutX="357.0" layoutY="218.0" mnemonicParsing="false" text="Sort by C.T. ASC" />
+            <RadioButton fx:id="sortByCreationTimeDescRadioButton" layoutX="357.0" layoutY="242.0" mnemonicParsing="false" text="Sort by C.T. DESC" />
+            <RadioButton fx:id="sortByNameRadioButton" layoutX="357.0" layoutY="266.0" mnemonicParsing="false" text="Sort by name ASC" />
          </children>
       </AnchorPane>
    </items>

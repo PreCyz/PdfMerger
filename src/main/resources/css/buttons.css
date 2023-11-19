@@ -1,0 +1,60 @@
+#arrow-down-button.button:hover {
+    -fx-border-color: RED;
+    -fx-border-style: solid;
+    -fx-border-with: 2px;
+}
+
+#arrow-up-button.button:hover {
+    -fx-border-color: GREEN;
+    -fx-border-style: solid;
+    -fx-border-with: 2px;
+}
+
+#plus-button.button:hover {
+    -fx-border-color: CORNFLOWERBLUE;
+    -fx-border-style: solid;
+    -fx-border-with: 2px;
+}
+
+#merge-button.button:hover {
+    -fx-border-color: CORNFLOWERBLUE;
+    -fx-border-style: solid;
+    -fx-border-with: 2px;
+}
+
+#arrow-down-button.button:pressed, #arrow-up-button.button:pressed, #plus-button.button:pressed, #merge-button.button:pressed {
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
+}
+
+#arrow-down-button {
+    -fx-background-image: url('./img/arrowDown.png');
+    -fx-background-color: white;
+    -fx-background-size: 30px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 50%;
+}
+
+#arrow-up-button {
+    -fx-background-image: url('./img/arrowUp.png');
+    -fx-background-color: white;
+    -fx-background-size: 30px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 50%;
+}
+
+#plus-button {
+    -fx-background-image: url('./img/plus.png');
+    -fx-background-color: white;
+    -fx-background-size: 30px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 50%;
+}
+
+#merge-button {
+    -fx-background-image: url('./img/merge.png');
+    -fx-background-color: DEFAULT;
+    -fx-background-size: 30px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 50%;
+}

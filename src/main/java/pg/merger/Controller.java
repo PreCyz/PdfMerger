@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -17,12 +18,14 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.platform.AppManagerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +68,13 @@ public class Controller implements Initializable {
     private Button upButton;
     @FXML
     private Button downButton;
+    @FXML
+    private Hyperlink openMergedFileHyperlink;
+    @FXML
+    private Hyperlink showMergedFileInExplorerHyperlink;
+    @FXML
+    private Button removeRowButton;
+
 
     private ArrayList<File> files;
     private String destinationDir;
@@ -78,12 +88,17 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         choosePdfsButton.setOnAction(choosePdfsAction());
+
         mergePdfsButton.setOnAction(mergePdfsAction());
+        mergePdfsButton.setDisable(true);
 
         ToggleGroup toggleGroup = new ToggleGroup();
         sortByCreationTimeAscRadioButton.setToggleGroup(toggleGroup);
         sortByCreationTimeDescRadioButton.setToggleGroup(toggleGroup);
         sortByNameRadioButton.setToggleGroup(toggleGroup);
+        sortByCreationTimeAscRadioButton.setDisable(true);
+        sortByCreationTimeDescRadioButton.setDisable(true);
+        sortByNameRadioButton.setDisable(true);
         toggleGroup.selectedToggleProperty().addListener(radioChangeListener());
 
         TableColumn<TableContent, ?> column = filesTableView.getColumns().get(0);
@@ -119,6 +134,41 @@ public class Controller implements Initializable {
 
         downButton.setDisable(true);
         downButton.setOnAction(moveDownActionEventHandler());
+        
+        showMergedFileInExplorerHyperlink.setVisible(false);
+        showMergedFileInExplorerHyperlink.setOnMouseClicked(showMergedFileInExplorerChangeListener());
+        openMergedFileHyperlink.setVisible(false);
+        openMergedFileHyperlink.setOnMouseClicked(openMergedFileChangeListener());
+
+        removeRowButton.setDisable(true);
+        removeRowButton.setOnAction(removeRowAction());
+    }
+
+    private EventHandler<ActionEvent> removeRowAction() {
+        return actionEvent -> {
+            int focusedIndex = filesTableView.getSelectionModel().getFocusedIndex();
+            files.remove(focusedIndex);
+            filesTableView.setItems(FXCollections.observableList(getTableViewItems()));
+            upButton.setDisable(files.size() < 2);
+            downButton.setDisable(files.size() < 2);
+            mergePdfsButton.setDisable(files.size() < 2);
+            sortByCreationTimeAscRadioButton.setDisable(files.size() < 2);
+            sortByNameRadioButton.setDisable(files.size() < 2);
+            sortByCreationTimeDescRadioButton.setDisable(files.size() < 2);
+            removeRowButton.setDisable(files.isEmpty());
+        };
+    }
+
+    private EventHandler<? super MouseEvent> openMergedFileChangeListener() {
+        return event -> {
+            openMergedFileHyperlink.setVisited(false);
+        };
+    }
+
+    private EventHandler<? super MouseEvent> showMergedFileInExplorerChangeListener() {
+        return event -> {
+            showMergedFileInExplorerHyperlink.setVisited(false);
+        };
     }
 
     private ChangeListener<Toggle> radioChangeListener() {
@@ -140,7 +190,11 @@ public class Controller implements Initializable {
         return (ChangeListener<Number>) (observableValue, oldVal, newVal) -> {
             upButton.setDisable(false);
             downButton.setDisable(false);
-            if (newVal.intValue() == 0) {
+            removeRowButton.setDisable(false);
+            if (files.size() == 1) {
+                upButton.setDisable(true);
+                downButton.setDisable(true);
+            } else if (newVal.intValue() == 0) {
                 upButton.setDisable(true);
             } else if (newVal.intValue() == files.size() - 1) {
                 downButton.setDisable(true);
@@ -197,6 +251,10 @@ public class Controller implements Initializable {
                 destinationDir = files.get(0).toPath().getParent().toString();
                 filesTableView.setItems(getTableViewItems());
             }
+            mergePdfsButton.setDisable(files.size() < 2);
+            sortByCreationTimeAscRadioButton.setDisable(files.size() < 2);
+            sortByCreationTimeDescRadioButton.setDisable(files.size() < 2);
+            sortByNameRadioButton.setDisable(files.size() < 2);
         };
     }
 
@@ -243,11 +301,27 @@ public class Controller implements Initializable {
             infoTextArea.setText(String.format("[%d] files merged.%n%s%nFind the [%s] in here:%n%s",
                     files.size(), fileNames, fileName, destinationFileName
             ));
+            openMergedFileHyperlink.setVisible(true);
+            openMergedFileHyperlink.setOnAction(openPdfAction(destinationFileName));
+            showMergedFileInExplorerHyperlink.setVisible(true);
+            showMergedFileInExplorerHyperlink.setOnAction(openFileExplorer());
         } catch (IOException e) {
             logger.error("Something went wrong.", e);
             infoTextArea.clear();
             infoTextArea.setText("Something went wrong :( " + e.getMessage());
         }
+    }
+
+    private EventHandler<ActionEvent> openFileExplorer() {
+        return actionEvent -> {
+            AppManagerFactory.getInstance().launchFileManager(destinationDir);
+        };
+    }
+
+    private EventHandler<ActionEvent> openPdfAction(final String pdfPath) {
+        return actionEvent -> {
+            AppManagerFactory.getInstance().openPdf(pdfPath);
+        };
     }
 
     private Comparator<File> creationTimeComparator(boolean isDesc) {

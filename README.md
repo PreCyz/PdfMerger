@@ -1,12 +1,20 @@
 Simple JavaFX to merge PDF files.
 
-Maven version:  3.8.4 <br />
+Maven version:  3.8.7 <br />
 Java version:   17 <br />
-JavaFX version: 17.0.0.1 <br />
+JavaFX version: 17.0.9 <br />
 
-Once the jar file is buid with `mvn clean install` then with following assumptions: <br />
-1. `%J11%` - is the path the Java 11 home directory. <br />
-2. `%JFX11%` - is the path to the `libs` directory from JavaFX 11.0.2 framework. <br />
+The jar file which is built with `mvn clean package` command is a fat jar. If your OS supports launching applications 
+with double-click, then this is how you execute the jar file.<br /><br />
+
+If you need more sophisticated ways then use below instruction
+```
+java -jar PdfMerger.jar
+```
+
+Or turbo complex way. Once the jar file is built with `mvn clean package` then with following assumptions: <br />
+1. `%J17%` - is the path the Java 17 home directory. <br />
+2. `%JFX17%` - is the path to the `libs` directory from JavaFX 17.0.9 framework. <br />
 3. `PdfMerger.jar` is the jar file that should be executed. <br />
 
 below command launches the program: 

@@ -23,7 +23,7 @@ public class Main extends Application {
         try {
             primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/css/img/merge.png"))));
             primaryStage.setOnCloseRequest(windowEvent -> System.exit(0));
-            primaryStage.setTitle("PdfMerger 1.0.6");
+            primaryStage.setTitle("PdfMerger 1.0.7");
             primaryStage.setWidth(831.0);
             primaryStage.setHeight(320.0);
             primaryStage.show();

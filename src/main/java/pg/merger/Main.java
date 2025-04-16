@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 
 public class Main extends Application {
 
@@ -19,6 +21,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
+            primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/css/img/merge.png"))));
             primaryStage.setOnCloseRequest(windowEvent -> System.exit(0));
             primaryStage.setTitle("PdfMerger 1.0.6");
             primaryStage.setWidth(831.0);

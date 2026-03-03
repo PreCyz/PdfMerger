@@ -7,15 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
@@ -32,15 +24,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.joining;
@@ -295,7 +281,7 @@ public class Controller implements Initializable {
                 ut.addSource(file);
             }
             ut.setDestinationFileName(destinationFileName);
-            ut.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+            ut.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly().streamCache);
             String fileNames = files.stream().map(File::getName).collect(joining("\n"));
             infoTextArea.clear();
             infoTextArea.setText(String.format("[%d] files merged.%n%s%nFind the [%s] in here:%n%s",

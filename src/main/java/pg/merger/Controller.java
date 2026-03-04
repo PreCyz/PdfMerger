@@ -1,5 +1,23 @@
 package pg.merger;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toCollection;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -7,7 +25,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
@@ -18,19 +44,6 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.platform.AppManagerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toCollection;
 
 public class Controller implements Initializable {
 
@@ -131,7 +144,7 @@ public class Controller implements Initializable {
     }
 
     private EventHandler<ActionEvent> removeRowAction() {
-        return actionEvent -> {
+        return _ -> {
             int focusedIndex = filesTableView.getSelectionModel().getFocusedIndex();
             files.remove(focusedIndex);
             filesTableView.setItems(FXCollections.observableList(getTableViewItems()));
@@ -146,19 +159,15 @@ public class Controller implements Initializable {
     }
 
     private EventHandler<? super MouseEvent> openMergedFileChangeListener() {
-        return event -> {
-            openMergedFileHyperlink.setVisited(false);
-        };
+        return _ -> openMergedFileHyperlink.setVisited(false);
     }
 
     private EventHandler<? super MouseEvent> showMergedFileInExplorerChangeListener() {
-        return event -> {
-            showMergedFileInExplorerHyperlink.setVisited(false);
-        };
+        return _ -> showMergedFileInExplorerHyperlink.setVisited(false);
     }
 
     private ChangeListener<Toggle> radioChangeListener() {
-        return (observableValue, oldValue, newValue) -> {
+        return (_, _, newValue) -> {
             if (newValue.equals(sortByCreationTimeAscRadioButton)) {
                 files = files.stream().sorted(creationTimeComparator(false)).collect(toCollection(ArrayList::new));
             } else if (newValue.equals(sortByCreationTimeDescRadioButton)) {
@@ -173,7 +182,7 @@ public class Controller implements Initializable {
     }
 
     private ChangeListener<? super Number> rowSelectedChangeListener() {
-        return (ChangeListener<Number>) (observableValue, oldVal, newVal) -> {
+        return (ChangeListener<Number>) (_, _, newVal) -> {
             upButton.setDisable(false);
             downButton.setDisable(false);
             removeRowButton.setDisable(false);
@@ -189,7 +198,7 @@ public class Controller implements Initializable {
     }
 
     private EventHandler<ActionEvent> moveUpActionEventHandler() {
-        return actionEvent -> {
+        return _ -> {
             int focusedIndex = filesTableView.getSelectionModel().getFocusedIndex();
             int moveIndex = focusedIndex - 1;
             swapElements(focusedIndex, moveIndex);
@@ -216,7 +225,7 @@ public class Controller implements Initializable {
     }
 
     private EventHandler<ActionEvent> moveDownActionEventHandler() {
-        return actionEvent -> {
+        return _ -> {
             int focusedIndex = filesTableView.getSelectionModel().getFocusedIndex();
             int moveIndex = focusedIndex + 1;
             swapElements(focusedIndex, moveIndex);
@@ -224,7 +233,7 @@ public class Controller implements Initializable {
     }
 
     private EventHandler<ActionEvent> choosePdfsAction() {
-        return actionEvent -> {
+        return _ -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("."));
             fileChooser.setTitle("Choose PDFs");
@@ -260,7 +269,7 @@ public class Controller implements Initializable {
     }
 
     private EventHandler<ActionEvent> mergePdfsAction() {
-        return actionEvent -> {
+        return _ -> {
             if (files.isEmpty()) {
                 infoTextArea.clear();
                 infoTextArea.setText("Nothing to merge");
@@ -281,7 +290,7 @@ public class Controller implements Initializable {
                 ut.addSource(file);
             }
             ut.setDestinationFileName(destinationFileName);
-            ut.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly().streamCache);
+            ut.mergeDocuments(MemoryUsageSetting.setupMixed(50 * 1024 * 1024).streamCache);
             String fileNames = files.stream().map(File::getName).collect(joining("\n"));
             infoTextArea.clear();
             infoTextArea.setText(String.format("[%d] files merged.%n%s%nFind the [%s] in here:%n%s",
@@ -299,15 +308,11 @@ public class Controller implements Initializable {
     }
 
     private EventHandler<ActionEvent> openFileExplorer() {
-        return actionEvent -> {
-            AppManagerFactory.getInstance().launchFileManager(destinationDir);
-        };
+        return _ -> AppManagerFactory.getInstance().launchFileManager(destinationDir);
     }
 
     private EventHandler<ActionEvent> openPdfAction(final String pdfPath) {
-        return actionEvent -> {
-            AppManagerFactory.getInstance().openPdf(pdfPath);
-        };
+        return _ -> AppManagerFactory.getInstance().openPdf(pdfPath);
     }
 
     private Comparator<File> creationTimeComparator(boolean isDesc) {
